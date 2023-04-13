@@ -1,4 +1,4 @@
-package com.mrs.xuecheng.content;
+package com.mrs.xuecheng;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

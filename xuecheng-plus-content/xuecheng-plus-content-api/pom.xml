@@ -65,8 +65,8 @@
             <artifactId>swagger-spring-boot-starter</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>swagger-models</artifactId>
                     <groupId>io.swagger</groupId>
+                    <artifactId>swagger-models</artifactId>
                 </exclusion>
             </exclusions>
             <version>1.9.0.RELEASE</version>
