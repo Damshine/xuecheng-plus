@@ -1,4 +1,4 @@
-package com.mrs.xuecheng.content.model;
+package com.mrs.xuecheng;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
