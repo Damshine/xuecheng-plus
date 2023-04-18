@@ -2,6 +2,8 @@ package com.mrs.xuecheng.content.service;
 
 import com.mrs.xuecheng.base.model.PageParams;
 import com.mrs.xuecheng.base.model.PageResult;
+import com.mrs.xuecheng.content.model.dto.AddCourseDto;
+import com.mrs.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.mrs.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.mrs.xuecheng.content.model.po.CourseBase;
 
@@ -14,5 +16,8 @@ public interface CourseBaseInfoService {
 
 
     PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto);
+
+
+    CourseBaseInfoDto createCourseBase(Long companyId, AddCourseDto dto);
 
 }

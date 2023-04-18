@@ -2,6 +2,8 @@ package com.mrs.xuecheng.content.api;
 
 import com.mrs.xuecheng.base.model.PageParams;
 import com.mrs.xuecheng.base.model.PageResult;
+import com.mrs.xuecheng.content.model.dto.AddCourseDto;
+import com.mrs.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.mrs.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.mrs.xuecheng.content.model.po.CourseBase;
 import com.mrs.xuecheng.content.service.CourseBaseInfoService;
@@ -31,6 +33,17 @@ public class CourseBaseInfoController {
     public PageResult<CourseBase> list(PageParams pageParams, @RequestBody QueryCourseParamsDto queryCourseParamsDto) {
         return courseBaseInfoService.queryCourseBaseList(pageParams,queryCourseParamsDto);
 
+    }
+
+    /**
+     *
+     * @return
+     */
+    @ApiOperation("新增课程基本信息")
+    @PostMapping("/course")
+    public CourseBaseInfoDto createCourseBase(@RequestBody AddCourseDto addCourseDto) {
+        Long companyId = 22L;
+        return courseBaseInfoService.createCourseBase(companyId, addCourseDto);
     }
 
 
