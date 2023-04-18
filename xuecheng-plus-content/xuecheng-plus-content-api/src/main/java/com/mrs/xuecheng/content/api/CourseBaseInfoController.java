@@ -27,7 +27,12 @@ public class CourseBaseInfoController {
     @Autowired
     private CourseBaseInfoService courseBaseInfoService;
 
-
+    /**
+     * 课程查询接口
+     * @param pageParams
+     * @param queryCourseParamsDto
+     * @return
+     */
     @ApiOperation("课程查询接口")
     @PostMapping("/course/list")
     public PageResult<CourseBase> list(PageParams pageParams, @RequestBody QueryCourseParamsDto queryCourseParamsDto) {
@@ -36,7 +41,7 @@ public class CourseBaseInfoController {
     }
 
     /**
-     *
+     *新增课程基本信息
      * @return
      */
     @ApiOperation("新增课程基本信息")
