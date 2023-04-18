@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mrs.xuecheng.base.model.PageParams;
 import com.mrs.xuecheng.base.model.PageResult;
 import com.mrs.xuecheng.content.mapper.CourseBaseMapper;
+import com.mrs.xuecheng.content.mapper.CourseCategoryMapper;
+import com.mrs.xuecheng.content.model.dto.CourseCategoryTreeDto;
 import com.mrs.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.mrs.xuecheng.content.model.po.CourseBase;
 import com.mrs.xuecheng.content.service.CourseBaseInfoService;
@@ -22,6 +24,9 @@ class XuechengPlusContentServiceApplicationTests {
 
     @Autowired
     private CourseBaseMapper courseBaseMapper;
+
+    @Autowired
+    private CourseCategoryMapper categoryMapper;
 
     @Autowired
     private CourseBaseInfoService courseBaseInfoService;
@@ -85,6 +90,12 @@ class XuechengPlusContentServiceApplicationTests {
 
     }
 
+
+    @Test
+    void testTreeNodes() {
+        List<CourseCategoryTreeDto> categoryTreeDtos = categoryMapper.selectTreeNodes("1");
+        System.out.println(categoryTreeDtos);
+    }
 
 
 
