@@ -1,5 +1,6 @@
 package com.mrs.xuecheng.content.api;
 
+import com.mrs.xuecheng.base.exception.ValidationGroups;
 import com.mrs.xuecheng.base.model.PageParams;
 import com.mrs.xuecheng.base.model.PageResult;
 import com.mrs.xuecheng.content.model.dto.AddCourseDto;
@@ -47,7 +48,7 @@ public class CourseBaseInfoController {
      */
     @ApiOperation("新增课程基本信息")
     @PostMapping("/course")
-    public CourseBaseInfoDto createCourseBase(@RequestBody @Validated AddCourseDto addCourseDto) {
+    public CourseBaseInfoDto createCourseBase(@RequestBody @Validated({ValidationGroups.Insert.class}) AddCourseDto addCourseDto) {
         //TODO 机构id，由于认证系统没有上线暂时硬编码
         Long companyId = 22L;
         return courseBaseInfoService.createCourseBase(companyId, addCourseDto);
