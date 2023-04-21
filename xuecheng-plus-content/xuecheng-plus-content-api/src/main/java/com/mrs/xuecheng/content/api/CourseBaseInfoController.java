@@ -5,6 +5,7 @@ import com.mrs.xuecheng.base.model.PageParams;
 import com.mrs.xuecheng.base.model.PageResult;
 import com.mrs.xuecheng.content.model.dto.AddCourseDto;
 import com.mrs.xuecheng.content.model.dto.CourseBaseInfoDto;
+import com.mrs.xuecheng.content.model.dto.EditCourseDto;
 import com.mrs.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.mrs.xuecheng.content.model.po.CourseBase;
 import com.mrs.xuecheng.content.service.CourseBaseInfoService;
@@ -12,9 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * description: 课程信息编辑接口
@@ -53,6 +52,25 @@ public class CourseBaseInfoController {
         Long companyId = 22L;
         return courseBaseInfoService.createCourseBase(companyId, addCourseDto);
     }
+
+    /**
+     * 根据课程id查询课程基础信息
+     * @param courseId
+     * @return
+     */
+    @ApiOperation("根据课程id查询课程基础信息")
+    @GetMapping("/course/{courseId}")
+    public CourseBaseInfoDto getCourseBaseById(@PathVariable Long courseId){
+        return courseBaseInfoService.getCourseBaseInfo(courseId);
+    }
+
+    @ApiOperation("修改课程基础信息")
+    @PutMapping("/course")
+    public CourseBaseInfoDto modifyCourseBase(@RequestBody @Validated EditCourseDto editCourseDto) {
+        return null;
+    }
+
+
 
 
 }

@@ -139,6 +139,30 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         return getCourseBaseInfo(courseId);
     }
 
+    @Override
+    public CourseBaseInfoDto getCourseBaseInfo(long courseId) {
+        //根据课程id查询课程基本信息，包括基本信息和营销信息
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        LambdaQueryWrapper<CourseMarket> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(CourseMarket::getId, courseId);
+        CourseMarket courseMarket = courseMarketMapper.selectOne(queryWrapper);
+        if(courseBase == null || courseMarket == null){
+            return null;
+        }
+
+        CourseBaseInfoDto courseBaseInfoDto = new CourseBaseInfoDto();
+        BeanUtils.copyProperties(courseBase, courseBaseInfoDto);
+        courseBaseInfoDto.setPrice(courseMarket.getPrice());
+        courseBaseInfoDto.setCharge(courseMarket.getCharge());
+        courseBaseInfoDto.setOriginalPrice(courseMarket.getOriginalPrice());
+        courseBaseInfoDto.setQq(courseMarket.getQq());
+        courseBaseInfoDto.setWechat(courseMarket.getWechat());
+        courseBaseInfoDto.setPhone(courseMarket.getPhone());
+        courseBaseInfoDto.setValidDays(courseMarket.getValidDays());
+
+        return courseBaseInfoDto;
+    }
+
     public CourseBaseInfoDto getCourseBaseInfo(Long courseId) {
 
         CourseBase courseBase = courseBaseMapper.selectById(courseId);

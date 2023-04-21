@@ -20,4 +20,6 @@ public interface CourseBaseInfoService {
 
     CourseBaseInfoDto createCourseBase(Long companyId, AddCourseDto dto);
 
+    CourseBaseInfoDto getCourseBaseInfo(long courseId);
+
 }
