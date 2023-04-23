@@ -64,10 +64,17 @@ public class CourseBaseInfoController {
         return courseBaseInfoService.getCourseBaseInfo(courseId);
     }
 
+    /**
+     * 修改课程信息
+     * @param editCourseDto
+     * @return
+     */
     @ApiOperation("修改课程基础信息")
     @PutMapping("/course")
     public CourseBaseInfoDto modifyCourseBase(@RequestBody @Validated EditCourseDto editCourseDto) {
-        return null;
+        //机构id，由于认证系统没有上线暂时硬编码
+        Long companyId = 1232141425L;
+        return courseBaseInfoService.updateCourseBase(companyId, editCourseDto);
     }
 
 

@@ -4,6 +4,7 @@ import com.mrs.xuecheng.base.model.PageParams;
 import com.mrs.xuecheng.base.model.PageResult;
 import com.mrs.xuecheng.content.model.dto.AddCourseDto;
 import com.mrs.xuecheng.content.model.dto.CourseBaseInfoDto;
+import com.mrs.xuecheng.content.model.dto.EditCourseDto;
 import com.mrs.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.mrs.xuecheng.content.model.po.CourseBase;
 
@@ -21,5 +22,7 @@ public interface CourseBaseInfoService {
     CourseBaseInfoDto createCourseBase(Long companyId, AddCourseDto dto);
 
     CourseBaseInfoDto getCourseBaseInfo(long courseId);
+
+    CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto dto);
 
 }
