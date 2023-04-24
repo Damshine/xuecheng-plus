@@ -19,7 +19,10 @@ public class CourseCategoryController {
     @Autowired
     private CourseCategoryService courseCategoryService;
 
-
+    /**
+     * 获取课程分类
+     * @return
+     */
     @GetMapping("/course-category/tree-nodes")
     public List<CourseCategoryTreeDto> queryTreeNodes() {
         return courseCategoryService.queryTreeNodes("1");
