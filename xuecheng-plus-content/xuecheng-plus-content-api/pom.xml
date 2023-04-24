@@ -33,6 +33,18 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-context</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+
         <!-- Spring Boot 的 Spring Web MVC 集成 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -78,6 +90,7 @@
             <version>1.5.21</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
