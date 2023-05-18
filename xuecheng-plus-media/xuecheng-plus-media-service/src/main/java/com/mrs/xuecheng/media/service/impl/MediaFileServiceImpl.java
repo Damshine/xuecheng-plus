@@ -18,6 +18,7 @@ import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.UploadObjectArgs;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +43,7 @@ import java.util.List;
  * @description TODO
  * @date 2022/9/10 8:58
  */
+@Slf4j
 @Service
 public class MediaFileServiceImpl implements MediaFileService {
 
@@ -265,7 +267,7 @@ public class MediaFileServiceImpl implements MediaFileService {
             }
 
             downloadFileFromMinIO(chunkFile, bucket_videofiles, chunkFilePath);
-            files[i]=chunkFile;
+            files[i] = chunkFile;
         }
 
         return files;
@@ -330,10 +332,95 @@ public class MediaFileServiceImpl implements MediaFileService {
      */
     @Override
     public RestResponse mergeChunks(Long companyId, String fileMd5, int chunkTotal, UploadFileParamsDto uploadFileParamsDto) {
-        return null;
+
+        //下载分块
+        File[] chunkFiles = checkChunkStatus(fileMd5, chunkTotal);
+
+        //得到合并后文件的扩展名
+        String filename = uploadFileParamsDto.getFilename();
+        //获取扩展名
+        String extension = filename.substring(filename.lastIndexOf("."));
+        //声明临时合并文件
+        File tempMergeFile = null;
+
+        try {
+
+            try {
+                //创建一个临时文件作为分块合并后的文件
+                tempMergeFile = File.createTempFile("merge", extension);
+            } catch (IOException e) {
+                XueChengPlusException.cast("创建临时合并文件出错");
+            }
+
+
+        //创建合并分块的流
+        try ( RandomAccessFile raf_w = new RandomAccessFile(tempMergeFile, "rw")) {
+            byte[] b = new byte[1024];
+            //遍历每个分块
+            for (File chunkFile : chunkFiles) {
+                try ( RandomAccessFile raf_r = new RandomAccessFile(chunkFile, "r")) {
+                    int len = -1;
+                    while ((len = raf_r.read(b)) != -1) {
+                        raf_w.write(b, 0, len);
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            XueChengPlusException.cast("合并文件过程出错");
+        }
+
+
+        //校验合并后的文件是否正确
+        try {
+            FileInputStream mergeFileInputStream = new FileInputStream(tempMergeFile);
+            //合并后文件的md5值
+            String mergeMd5Hex = DigestUtils.md5Hex(mergeFileInputStream);
+
+            //校验
+            if ( !fileMd5.equals(mergeMd5Hex) ) {
+                log.debug("合并文件校验不通过,文件路径:{},原始文件md5:{}", tempMergeFile.getAbsolutePath(), fileMd5);
+                XueChengPlusException.cast("合并文件校验不通过");
+            }
+        } catch (IOException e) {
+            log.debug("合并文件校验出错,文件路径:{},原始文件md5:{}", tempMergeFile.getAbsolutePath(), fileMd5);
+            XueChengPlusException.cast("合并文件校验出错");
+        }
+
+        //拿到合并文件在minio中的存储路径
+        String mergeFilePath = getFilePathByMd5(fileMd5, extension);
+        //将合并文件上传到minio中
+        addMediaFilesToMinIO(tempMergeFile.getAbsolutePath(), bucket_videofiles, mergeFilePath);
+
+
+        //将文件信息入库
+        uploadFileParamsDto.setFileSize(tempMergeFile.length());
+        addMediaFilesToDb(companyId, fileMd5, uploadFileParamsDto, bucket_videofiles, mergeFilePath);
+
+        return RestResponse.success(true);
+        } finally {
+            //删除临时分块文件
+            if (chunkFiles != null) {
+                for (File chunkFile : chunkFiles) {
+                    if (chunkFile.exists()) {
+                        chunkFile.delete();
+                    }
+                }
+            }
+            //删除合并的临时文件
+            if(tempMergeFile!=null){
+                tempMergeFile.delete();
+            }
+
+        }
     }
 
+    private String getFilePathByMd5(String fileMd5, String extension) {
 
+        return fileMd5.substring(0,1) + "/" + fileMd5.substring(1,2) + "/" + fileMd5 + "/"  + fileMd5 + extension;
+
+    }
 
     //将文件上传到文件系统
     public void addMediaFilesToMinIO(String filePath, String bucket, String objectName){
