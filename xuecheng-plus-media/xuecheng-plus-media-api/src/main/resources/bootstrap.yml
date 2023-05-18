@@ -1,5 +1,10 @@
 #微服务配置
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB     #单个文件最大限制
+      max-request-size: 50MB  #多个文件最大限制
+
   application:
     name: media-api
   cloud:
@@ -21,9 +26,9 @@ spring:
           - data-id: swagger-${spring.profiles.active}.yaml
             group: xuecheng-plus-common
             refresh: true
-          - data-id: logging-${spring.profiles.active}.yaml
-            group: xuecheng-plus-common
-            refresh: true
+#          - data-id: logging-${spring.profiles.active}.yaml
+#            group: xuecheng-plus-common
+#            refresh: true
   profiles:
     active: dev
 
