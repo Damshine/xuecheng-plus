@@ -416,6 +416,16 @@ public class MediaFileServiceImpl implements MediaFileService {
         }
     }
 
+    @Override
+    public MediaFiles getFileById(String mediaId) {
+
+        MediaFiles mediaFiles = mediaFilesMapper.selectById(mediaId);
+        if (mediaFiles == null || StringUtils.isEmpty(mediaFiles.getUrl())) {
+            XueChengPlusException.cast("视频还没有转码处理");
+        }
+        return mediaFiles;
+    }
+
     private String getFilePathByMd5(String fileMd5, String extension) {
 
         return fileMd5.substring(0,1) + "/" + fileMd5.substring(1,2) + "/" + fileMd5 + "/"  + fileMd5 + extension;

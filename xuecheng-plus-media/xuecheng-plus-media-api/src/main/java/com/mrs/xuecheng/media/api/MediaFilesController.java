@@ -4,6 +4,7 @@ package com.mrs.xuecheng.media.api;
 import com.mrs.xuecheng.base.exception.XueChengPlusException;
 import com.mrs.xuecheng.base.model.PageParams;
 import com.mrs.xuecheng.base.model.PageResult;
+import com.mrs.xuecheng.base.model.RestResponse;
 import com.mrs.xuecheng.media.model.dto.QueryMediaParamsDto;
 import com.mrs.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.mrs.xuecheng.media.model.dto.UploadFileResultDto;
@@ -72,6 +73,19 @@ public class MediaFilesController {
 
         return uploadFileResultDto;
 
+    }
+
+
+    /**
+     * 根据mediaId获取预览文件url
+     * @param mediaId
+     * @return
+     */
+    @ApiOperation(value = "预览文件")
+    @GetMapping("/preview/{mediaId}")
+    public RestResponse<String> getPlayUrlByMediaId(@PathVariable String mediaId) {
+        MediaFiles mediaFile = mediaFileService.getFileById(mediaId);
+        return RestResponse.success(mediaFile.getUrl());
     }
 
 
