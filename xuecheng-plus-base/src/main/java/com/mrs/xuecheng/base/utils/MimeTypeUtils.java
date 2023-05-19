@@ -1,4 +1,4 @@
-package com.mrs.xuecheng.base.util;
+package com.mrs.xuecheng.base.utils;
 
 import com.j256.simplemagic.ContentInfo;
 import com.j256.simplemagic.ContentInfoUtil;
