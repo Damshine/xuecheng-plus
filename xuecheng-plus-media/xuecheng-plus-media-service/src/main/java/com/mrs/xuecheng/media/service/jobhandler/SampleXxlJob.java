@@ -1,5 +1,6 @@
 package com.mrs.xuecheng.media.service.jobhandler;
 
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,22 @@ public class SampleXxlJob {
 
     }
 
+
+    /**
+     * 分片广播任务
+     */
+    @XxlJob("shardingJobHandler")
+    public void shardingJobHandler() {
+
+        //分片参数
+
+        //获取
+        int shardIndex = XxlJobHelper.getShardIndex();
+        int shardTotal = XxlJobHelper.getShardTotal();
+
+        System.out.println("shardIndex->" + shardIndex + "\tshardTotal->" + shardTotal);
+
+    }
 
 
 
