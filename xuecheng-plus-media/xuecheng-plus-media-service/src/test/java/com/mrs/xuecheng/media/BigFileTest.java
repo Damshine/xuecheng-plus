@@ -118,8 +118,7 @@ public class BigFileTest {
 
     @Test
     void testTempFile() throws IOException {
-        File tempFile = File.createTempFile("minio", "tmp", new File("d:\\"));
-        System.out.println(tempFile.getAbsoluteFile());
+        System.out.println(System.getProperty("java.io.tmpdir"));
     }
 
 }

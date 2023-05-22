@@ -43,6 +43,16 @@ public class MediaProcess implements Serializable {
     private String status;
 
     /**
+     * 文件路径
+     */
+    private String filePath;
+
+    /**
+     * 失败重试次数
+     */
+    private int failCount;
+
+    /**
      * 上传时间
      */
     @TableField(fill = FieldFill.INSERT)
@@ -58,5 +68,9 @@ public class MediaProcess implements Serializable {
      */
     private String url;
 
+    /**
+     * 失败原因
+     */
+    private String errormsg;
 
 }

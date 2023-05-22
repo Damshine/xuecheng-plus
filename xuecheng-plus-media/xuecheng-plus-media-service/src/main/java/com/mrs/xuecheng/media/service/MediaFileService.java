@@ -9,6 +9,8 @@ import com.mrs.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.mrs.xuecheng.media.model.dto.UploadFileResultDto;
 import com.mrs.xuecheng.media.model.po.MediaFiles;
 
+import java.io.File;
+
 /**
  * @author Mr.M
  * @version 1.0
@@ -40,4 +42,21 @@ public interface MediaFileService {
     RestResponse mergeChunks(Long companyId, String fileMd5, int chunkTotal, UploadFileParamsDto uploadFileParamsDto);
 
     MediaFiles getFileById(String mediaId);
+
+
+    File downloadFileFromMinIO(File file, String bucket, String objectName);
+
+    void addMediaFilesToMinIO(String filePath, String bucket, String objectName);
+
+    /**
+     * 根据文件md5，生成在minio中的文件路径
+     * @param fileMd5       文件md5
+     * @param extension     文件后缀名
+     * @return
+     */
+    String getFilePathByMd5(String fileMd5, String extension);
+
+    File downloadFileFromMinIO(String bucket, String objectName);
+
+    boolean addMediaFilesToMinIO(String localFilePath, String mimeType, String bucket, String objectName);
 }
