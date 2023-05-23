@@ -1,5 +1,6 @@
 package com.mrs.xuecheng.content.api;
 
+import com.mrs.xuecheng.content.model.dto.BindTeachplanMediaDto;
 import com.mrs.xuecheng.content.model.dto.SaveTeachplanDto;
 import com.mrs.xuecheng.content.model.dto.TeachplanDto;
 import com.mrs.xuecheng.content.service.TeachplanService;
@@ -46,6 +47,15 @@ public class TeachplanController {
         teachplanService.saveTeachplan(dto);
     }
 
+    /**
+     * 课程计划和媒资信息绑定
+     * @param bindTeachplanMediaDto
+     */
+    @ApiOperation(value = "课程计划和媒资信息绑定")
+    @PostMapping("/teachplan/association/media")
+    public void associationMedia(@RequestBody BindTeachplanMediaDto bindTeachplanMediaDto){
+        teachplanService.associationMedia(bindTeachplanMediaDto);
+    }
 
 
 }
