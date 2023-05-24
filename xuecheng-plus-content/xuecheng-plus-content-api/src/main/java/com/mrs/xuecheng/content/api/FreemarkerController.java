@@ -1,5 +1,6 @@
 package com.mrs.xuecheng.content.api;
 
+import io.swagger.annotations.Api;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -9,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
  * date: 2023/5/23 11:15
  * author: MR.孙
  */
+@Api(value = "测试FreeMarker",tags = "测试FreeMarker")
 @Controller
 public class FreemarkerController {
 
