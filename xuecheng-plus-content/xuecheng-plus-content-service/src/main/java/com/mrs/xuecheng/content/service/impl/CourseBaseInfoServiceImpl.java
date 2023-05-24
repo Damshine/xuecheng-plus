@@ -166,6 +166,15 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         courseBaseInfoDto.setPhone(courseMarket.getPhone());
         courseBaseInfoDto.setValidDays(courseMarket.getValidDays());
 
+
+        //通过courseCategoryMapper查询分类信息，将分类名称放在courseBaseInfoDto对象
+        CourseCategory mtObj = courseCategoryMapper.selectById(courseBase.getMt());
+        String mtName = mtObj.getName();//大分类名称
+        courseBaseInfoDto.setMtName(mtName);
+        CourseCategory stObj = courseCategoryMapper.selectById(courseBase.getSt());
+        String stName = stObj.getName();//小分类名称
+        courseBaseInfoDto.setStName(stName);
+
         return courseBaseInfoDto;
     }
 
