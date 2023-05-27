@@ -59,4 +59,6 @@ public interface MediaFileService {
     File downloadFileFromMinIO(String bucket, String objectName);
 
     boolean addMediaFilesToMinIO(String localFilePath, String mimeType, String bucket, String objectName);
+
+    UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath, String objectName);
 }

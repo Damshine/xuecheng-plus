@@ -11,12 +11,12 @@ import com.mrs.xuecheng.base.model.RestResponse;
 import com.mrs.xuecheng.base.utils.MimeTypeUtils;
 import com.mrs.xuecheng.media.mapper.MediaFilesMapper;
 import com.mrs.xuecheng.media.mapper.MediaProcessMapper;
-import com.mrs.xuecheng.media.model.po.MediaProcess;
-import com.mrs.xuecheng.media.service.MediaFileService;
 import com.mrs.xuecheng.media.model.dto.QueryMediaParamsDto;
 import com.mrs.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.mrs.xuecheng.media.model.dto.UploadFileResultDto;
 import com.mrs.xuecheng.media.model.po.MediaFiles;
+import com.mrs.xuecheng.media.model.po.MediaProcess;
+import com.mrs.xuecheng.media.service.MediaFileService;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -156,8 +157,59 @@ public class MediaFileServiceImpl implements MediaFileService {
         return false;
     }
 
+    @Override
+    public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath, String objectName) {
+        //文件名
+        String filename = uploadFileParamsDto.getFilename();
+        //先得到扩展名
+        String extension = filename.substring(filename.lastIndexOf("."));
+
+        //得到mimeType
+        String mimeType = MimeTypeUtils.getMimeTypeByExtension(extension);
+
+        //子目录
+        String defaultFolderPath = getDefaultFolderPath();
+        //文件的md5值
+        String fileMd5 = getFileMd5(new File(localFilePath));
+        if (StringUtils.isEmpty(objectName)) {
+            //使用默认年月日去存储
+            objectName = defaultFolderPath + fileMd5 + extension;
+        }
+        //上传文件到minio
+        boolean result = addMediaFilesToMinIO(localFilePath, mimeType, bucket_Files, objectName);
+        if (!result) {
+            XueChengPlusException.cast("上传文件失败");
+        }
+        //入库文件信息
+        MediaFiles mediaFiles = currentProxy.addMediaFilesToDb(companyId, fileMd5, uploadFileParamsDto, bucket_Files, objectName);
+        if (mediaFiles == null) {
+            XueChengPlusException.cast("文件上传后保存信息失败");
+        }
+        //准备返回的对象
+        UploadFileResultDto uploadFileResultDto = new UploadFileResultDto();
+        BeanUtils.copyProperties(mediaFiles, uploadFileResultDto);
+
+        return uploadFileResultDto;
+    }
 
 
+    //获取文件的md5
+    private String getFileMd5(File file) {
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+            String fileMd5 = DigestUtils.md5Hex(fileInputStream);
+            return fileMd5;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    //获取文件默认存储目录路径 年/月/日
+    private String getDefaultFolderPath() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String folder = sdf.format(new Date()).replace("-", "/") + "/";
+        return folder;
+    }
 
 
 

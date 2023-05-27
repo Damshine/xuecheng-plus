@@ -2,6 +2,8 @@ package com.mrs.xuecheng.content.service;
 
 import com.mrs.xuecheng.content.model.dto.CoursePreviewDto;
 
+import java.io.File;
+
 public interface CoursePublishService {
 
     /**
@@ -17,4 +19,15 @@ public interface CoursePublishService {
      * @param courseId
      */
     void commitAudit(Long companyId, Long courseId);
+
+    void publish(Long companyId, Long courseId);
+
+    /**
+     * 课程静态化
+     * @param courseId
+     * @return
+     */
+    File generateCourseHtml(Long courseId);
+
+    void  uploadCourseHtml(Long courseId,File file);
 }

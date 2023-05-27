@@ -190,9 +190,9 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
             XueChengPlusException.cast("课程不存在");
         }
 
-        if (!companyId.equals(courseBaseUpdate.getCompanyId())) {
-            XueChengPlusException.cast("只允许修改本机构的课程");
-        }
+        // if (!companyId.equals(courseBaseUpdate.getCompanyId())) {
+        //     XueChengPlusException.cast("只允许修改本机构的课程");
+        // }
 
         BeanUtils.copyProperties(dto, courseBaseUpdate);
 
