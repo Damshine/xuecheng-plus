@@ -1,7 +1,9 @@
 package com.mrs.xuecheng.content.service.jobhandler;
 
 import com.mrs.xuecheng.base.exception.XueChengPlusException;
+import com.mrs.xuecheng.content.feignclient.SearchServiceClient;
 import com.mrs.xuecheng.content.mapper.CoursePublishMapper;
+import com.mrs.xuecheng.content.model.po.CourseIndex;
 import com.mrs.xuecheng.content.model.po.CoursePublish;
 import com.mrs.xuecheng.content.service.CoursePublishService;
 import com.mrs.xuecheng.messagesdk.model.po.MqMessage;
@@ -10,6 +12,7 @@ import com.mrs.xuecheng.messagesdk.service.MqMessageService;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +29,9 @@ public class CoursePublishTask extends MessageProcessAbstract {
 
     @Autowired
     CoursePublishService coursePublishService;
+
+    @Autowired
+    SearchServiceClient searchServiceClient;
 
     @Autowired
     CoursePublishMapper coursePublishMapper;
@@ -85,14 +91,30 @@ public class CoursePublishTask extends MessageProcessAbstract {
             return;
         }
 
-        //查询课程信息，调用搜索服务添加索引接口
-        //从课程发布表查询课程信息
-        CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
+        Boolean result = saveCourseIndex(courseId);
+        if(result){
+            //保存第一阶段状态
+            mqMessageService.completedStageTwo(taskId);
+        }
 
-        //完成本阶段任务
-        mqMessageService.completedStageTwo(taskId);
+
     }
 
+    private Boolean saveCourseIndex(Long courseId) {
+
+        //从课程发布表查询课程信息
+        CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
+        //拷贝至课程索引对象
+        CourseIndex courseIndex = new CourseIndex();
+        BeanUtils.copyProperties(coursePublish, courseIndex);
+        //远程调用搜索服务api添加课程信息到索引
+        Boolean add = searchServiceClient.add(courseIndex);
+        if(!add){
+            XueChengPlusException.cast("添加索引失败");
+        }
+        return add;
+
+    }
 
 
     //生成课程静态化页面并上传至文件系统
