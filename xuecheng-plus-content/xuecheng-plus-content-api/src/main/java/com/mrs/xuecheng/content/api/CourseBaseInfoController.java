@@ -12,7 +12,9 @@ import com.mrs.xuecheng.content.service.CourseBaseInfoService;
 import com.mrs.xuecheng.content.util.SecurityUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,9 +38,20 @@ public class CourseBaseInfoController {
      * @return
      */
     @ApiOperation("课程查询接口")
+    @PreAuthorize("hasAnyAuthority('xc_teachmanager_course_list')")  // 拥有课程列表查询的接口方可查询
     @PostMapping("/course/list")
     public PageResult<CourseBase> list(PageParams pageParams, @RequestBody QueryCourseParamsDto queryCourseParamsDto) {
-        return courseBaseInfoService.queryCourseBaseList(pageParams,queryCourseParamsDto);
+
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        //用户所属机构id
+        Long companyId = null;
+
+        if (StringUtils.isNotEmpty(user.getCompanyId())) {
+            companyId = Long.parseLong(user.getCompanyId());
+        }
+
+
+        return courseBaseInfoService.queryCourseBaseList(companyId, pageParams,queryCourseParamsDto);
 
     }
 
