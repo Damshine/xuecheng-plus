@@ -11,8 +11,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mrs.xuecheng.base.exception.XueChengPlusException;
 import com.mrs.xuecheng.base.utils.IdWorkerUtils;
 import com.mrs.xuecheng.base.utils.QRCodeUtil;
+import com.mrs.xuecheng.messagesdk.model.po.MqMessage;
 import com.mrs.xuecheng.messagesdk.service.MqMessageService;
 import com.mrs.xuecheng.orders.config.AlipayConfig;
+import com.mrs.xuecheng.orders.config.PayNotifyConfig;
 import com.mrs.xuecheng.orders.mapper.XcOrdersGoodsMapper;
 import com.mrs.xuecheng.orders.mapper.XcOrdersMapper;
 import com.mrs.xuecheng.orders.mapper.XcPayRecordMapper;
@@ -24,6 +26,10 @@ import com.mrs.xuecheng.orders.model.po.XcOrdersGoods;
 import com.mrs.xuecheng.orders.model.po.XcPayRecord;
 import com.mrs.xuecheng.orders.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageDeliveryMode;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -178,7 +185,50 @@ public class OrderServiceImpl implements OrderService {
             xcOrders.setStatus("600002");//订单状态为交易成功
             ordersMapper.updateById(xcOrders);
 
+            //将消息写到数据库
+            MqMessage mqMessage = mqMessageService.addMessage("payresult_notify", xcOrders.getOutBusinessId(), xcOrders.getOrderType(), null);
+            //发送消息
+            notifyPayResult(mqMessage);
         }
+
+
+    }
+
+    @Override
+    public void notifyPayResult(MqMessage message) {
+
+        //消息内容
+        String jsonString = JSON.toJSONString(message);
+        //消息持久化
+        Message messageObj = MessageBuilder.withBody(jsonString.getBytes(StandardCharsets.UTF_8)).setDeliveryMode(MessageDeliveryMode.PERSISTENT).build();
+
+
+        //消息id【因为id是主键且自增所以唯一】
+        Long id = message.getId();
+        //全局消息Id
+        CorrelationData correlationData = new CorrelationData(id.toString());
+
+        //设置回调，判断消息是否成功到达交换机
+        correlationData.getFuture().addCallback(result->{
+
+            if(result.isAck()) {
+                //消息成功发送到了交换机
+                log.debug("发送消息成功:{}",jsonString);
+                //将消息从数据库表mq_message删除
+                mqMessageService.completed(id);
+            } else {
+                //消息发送失败
+                log.debug("发送消息失败:{}",jsonString);
+            }
+
+        }, ex->{
+            //发生异常了
+            log.debug("发送消息异常:{}",jsonString);
+        });
+
+
+        //发送消息  路由键为空并且交换机为fanout表示发送所有与交换机绑定的队列
+        rabbitTemplate.convertAndSend(PayNotifyConfig.PAYNOTIFY_EXCHANGE_FANOUT, "", messageObj, correlationData);
 
 
     }
