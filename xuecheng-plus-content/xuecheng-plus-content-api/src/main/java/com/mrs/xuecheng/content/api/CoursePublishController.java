@@ -1,10 +1,14 @@
 package com.mrs.xuecheng.content.api;
 
+import com.alibaba.fastjson.JSON;
+import com.mrs.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.mrs.xuecheng.content.model.dto.CoursePreviewDto;
+import com.mrs.xuecheng.content.model.dto.TeachplanDto;
 import com.mrs.xuecheng.content.model.po.CoursePublish;
 import com.mrs.xuecheng.content.service.CoursePublishService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.List;
 
 /**
  * description: CoursePublishController
@@ -24,6 +30,38 @@ public class CoursePublishController {
 
     @Autowired
     CoursePublishService coursePublishService;
+
+
+    @ApiOperation("获取课程发布信息")
+    @ResponseBody
+    @GetMapping("/course/whole/{courseId}")
+    public CoursePreviewDto getPreviewInfo(@PathVariable("courseId") Long courseId) {
+
+        //封装数据
+        CoursePreviewDto coursePreviewDto = new CoursePreviewDto();
+
+        //查询课程发布表
+        CoursePublish coursePublish = coursePublishService.getCoursePublish(courseId);
+        if (coursePublish == null) {
+            return coursePreviewDto;
+        }
+
+        //开始向coursePreviewDto
+        CourseBaseInfoDto courseBaseInfoDto = new CourseBaseInfoDto();
+        BeanUtils.copyProperties(coursePublish, courseBaseInfoDto);
+
+        //查询课程计划
+        String teachplanJson = coursePublish.getTeachplan();
+        List<TeachplanDto> teachplanDtos = JSON.parseArray(teachplanJson, TeachplanDto.class);
+        coursePreviewDto.setCourseBase(courseBaseInfoDto);
+        coursePreviewDto.setTeachplans(teachplanDtos);
+
+        return coursePreviewDto;
+
+    }
+
+
+
 
     /**
      * 根据课程id提交审核
